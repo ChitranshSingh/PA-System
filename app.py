@@ -58,21 +58,37 @@ LANGUAGES = {
     'ta': {'name': 'தமிழ் (Tamil)', 'flag': '🇮🇳'}
 }
 
-def get_local_ip():
-    """Get local IP address for QR code generation"""
+def get_base_url():
+    """Get the base URL for the application (detects production vs local)"""
+    # Check if running on Render or other cloud platforms
+    render_external_url = os.environ.get('RENDER_EXTERNAL_URL')
+    if render_external_url:
+        return render_external_url
+    
+    # Check for Railway
+    railway_url = os.environ.get('RAILWAY_PUBLIC_DOMAIN')
+    if railway_url:
+        return f"https://{railway_url}"
+    
+    # Check for Heroku
+    heroku_app_name = os.environ.get('HEROKU_APP_NAME')
+    if heroku_app_name:
+        return f"https://{heroku_app_name}.herokuapp.com"
+    
+    # For local development, try to get local IP
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.connect(("8.8.8.8", 80))
         local_ip = s.getsockname()[0]
         s.close()
-        return local_ip
+        return f"http://{local_ip}:5000"
     except Exception:
-        return "localhost"
+        return "http://localhost:5000"
 
 def generate_qr_code():
     """Generate QR code for client access"""
-    local_ip = get_local_ip()
-    client_url = f"http://{local_ip}:5000/client"
+    base_url = get_base_url()
+    client_url = f"{base_url}/client"
     
     qr = qrcode.QRCode(version=1, box_size=10, border=5)
     qr.add_data(client_url)
