@@ -161,6 +161,26 @@ def api_history():
     """API endpoint for announcement history"""
     return jsonify(announcement_history)
 
+@app.route('/api/clear-history', methods=['POST'])
+@login_required
+def clear_history():
+    """Clear all announcement history (Admin only)"""
+    global announcement_history
+    announcement_history = []
+    
+    # Optionally clear audio files to save space
+    try:
+        audio_dir = 'static/audio'
+        for filename in os.listdir(audio_dir):
+            if filename.endswith('.mp3'):
+                file_path = os.path.join(audio_dir, filename)
+                os.remove(file_path)
+        print('🗑️ Cleared announcement history and audio files')
+    except Exception as e:
+        print(f'⚠️ Could not clear audio files: {e}')
+    
+    return jsonify({'success': True, 'message': 'History cleared successfully'})
+
 # WebSocket Event Handlers
 @socketio.on('connect')
 def handle_connect():

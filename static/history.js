@@ -109,11 +109,26 @@ function playAudio(audioUrl) {
 
 // Clear History
 function clearHistory() {
-    if (confirm('⚠️ Are you sure you want to clear all announcement history?')) {
-        // This would require a backend endpoint
-        alert('🚧 This feature requires backend implementation');
-        // For now, just refresh
-        location.reload();
+    if (confirm('⚠️ Are you sure you want to clear all announcement history? This will delete all records and audio files.')) {
+        fetch('/api/clear-history', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('✅ ' + data.message);
+                location.reload();
+            } else {
+                alert('❌ Failed to clear history');
+            }
+        })
+        .catch(err => {
+            console.error('Failed to clear history:', err);
+            alert('❌ Failed to clear history. Please ensure you are logged in as admin.');
+        });
     }
 }
 
