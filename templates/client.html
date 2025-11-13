@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PA System - Client Display</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://cdn.socket.io/4.6.0/socket.io.min.js"></script>
+</head>
+<body class="client-body">
+    <nav class="navbar navbar-transparent">
+        <div class="nav-container">
+            <a href="/" class="nav-brand">🔊 PA System</a>
+            <div class="nav-links">
+                <a href="/admin">Admin</a>
+                <a href="/client" class="active">Client</a>
+                <a href="/history">History</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="client-container">
+        <!-- Header Controls -->
+        <div class="client-header">
+            <div class="status-bar" id="statusBar">
+                <span class="status-indicator" id="statusIndicator">🟡</span>
+                <span id="statusText">Connecting...</span>
+            </div>
+            
+            <div class="language-selector-wrapper">
+                <label for="languageSelect">🌍 Language:</label>
+                <select id="languageSelect" class="language-select">
+                    {% for code, lang in languages.items() %}
+                    <option value="{{ code }}">{{ lang.flag }} {{ lang.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <button id="soundToggle" class="sound-toggle" onclick="toggleSound()">
+                <span id="soundIcon">🔊</span>
+                <span id="soundText">Sound On</span>
+            </button>
+        </div>
+
+        <!-- Main Announcement Display -->
+        <div id="announcementDisplay">
+            <div class="waiting-state">
+                <div class="waiting-icon">⏳</div>
+                <h2>Waiting for Announcements...</h2>
+                <p>You will be notified when a new announcement is broadcasted</p>
+                <div class="pulse-indicator"></div>
+            </div>
+        </div>
+
+        <!-- All Languages Display -->
+        <div id="allLanguages" class="all-languages" style="display: none;">
+            <h3>📝 All Languages</h3>
+            <div id="languagesList"></div>
+        </div>
+
+        <!-- Recent Announcements -->
+        <div id="recentAnnouncements" class="recent-announcements" style="display: none;">
+            <h3>📜 Recent Announcements</h3>
+            <div id="recentList"></div>
+        </div>
+    </div>
+
+    <!-- Audio Player (hidden) -->
+    <audio id="audioPlayer" preload="auto"></audio>
+
+    <script src="/static/client.js"></script>
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PA System - Announcement History</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://cdn.socket.io/4.6.0/socket.io.min.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="nav-brand">🔊 PA System</a>
+            <div class="nav-links">
+                <a href="/admin">Admin</a>
+                <a href="/client">Client</a>
+                <a href="/history" class="active">History</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="card">
+            <h1 class="card-title">📜 Announcement History</h1>
+            
+            <div class="history-controls">
+                <button onclick="refreshHistory()" class="btn btn-secondary">
+                    🔄 Refresh
+                </button>
+                <button onclick="clearHistory()" class="btn btn-danger">
+                    🗑️ Clear All
+                </button>
+            </div>
+
+            <div id="historyList" class="history-list">
+                {% if history %}
+                    {% for item in history %}
+                    <div class="history-item" data-id="{{ item.id }}">
+                        <div class="history-header">
+                            <div class="history-info">
+                                <span class="priority-badge {{ item.priority }}">
+                                    {% if item.priority == 'emergency' %}🔴 EMERGENCY
+                                    {% elif item.priority == 'warning' %}🟡 WARNING
+                                    {% else %}🟢 NORMAL{% endif %}
+                                </span>
+                                <span class="history-time">{{ item.timestamp }}</span>
+                            </div>
+                            <button onclick="replayAnnouncement({{ item.id }})" class="btn-replay">
+                                ▶️ Replay
+                            </button>
+                        </div>
+                        <div class="history-text">{{ item.original_text }}</div>
+                        <div class="history-languages">
+                            <strong>Languages:</strong>
+                            {% for lang in item.languages %}
+                            <span class="lang-tag">{{ lang.upper() }}</span>
+                            {% endfor %}
+                        </div>
+                        <div class="history-details">
+                            {% for ann in item.announcements %}
+                            <div class="lang-detail">
+                                <strong>{{ ann.flag }} {{ ann.language_name }}:</strong>
+                                <span>{{ ann.text }}</span>
+                                {% if ann.audio_url %}
+                                <button onclick="playAudio('{{ ann.audio_url }}')" class="btn-play">
+                                    🔊 Play
+                                </button>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <div class="empty-icon">📭</div>
+                        <h3>No Announcements Yet</h3>
+                        <p>Broadcast your first announcement from the Admin Dashboard</p>
+                        <a href="/admin" class="btn btn-primary">Go to Admin</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <audio id="audioPlayer"></audio>
+
+    <script src="/static/history.js"></script>
+</body>
+</html>
